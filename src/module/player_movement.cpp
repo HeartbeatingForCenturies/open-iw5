@@ -612,8 +612,11 @@ void player_movement::patch_sp()
 	jump_spreadAdd = game::native::Dvar_RegisterFloat("jump_spreadAdd",
 		64.0f, 0.0f, 512.0f, game::native::DVAR_CODINFO, "The amount of spread scale to add as a side effect of jumping");
 
-	// Un-cheat player_sprintUnlimited
+	// Un-cheat player_sprintUnlimited & make it work when so_survival is set to 1
 	utils::hook::set<std::uint32_t>(0x494D4F, game::native::DVAR_NONE);
+	utils::hook::nop(0x4B937E, 2);
+	utils::hook::nop(0x559CB8, 2);
+	utils::hook::set<std::uint8_t>(0x63F70D, 0xEB);
 
 	utils::hook(0x648C3A, pm_weapon_use_ammo, HOOK_CALL).install()->quick();
 	utils::hook(0x64891D, pm_weapon_use_ammo, HOOK_CALL).install()->quick();
