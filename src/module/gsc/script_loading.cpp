@@ -32,9 +32,9 @@ namespace gsc
 		void clear()
 		{
 			script_file_allocator.clear();
+			loaded_scripts.clear();
 			main_handles.clear();
 			init_handles.clear();
-			loaded_scripts.clear();
 		}
 
 		bool read_raw_script_file(const std::string& name, std::string* data)
