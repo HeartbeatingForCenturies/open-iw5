@@ -11,8 +11,7 @@
 #include <utils/hook.hpp>
 #include <utils/string.hpp>
 
-#include <xsk/gsc/types.hpp>
-#include <xsk/resolver.hpp>
+#include <gsc_interface.hpp>
 
 using namespace utils::string;
 
@@ -125,7 +124,8 @@ namespace gsc
 		{
 			try
 			{
-				return {xsk::gsc::iw5::resolver::opcode_name(opcode)};
+				auto index = gsc::cxt->opcode_enum(opcode);
+				return {xsk::gsc::opcode_name(index)};
 			}
 			catch (...)
 			{
@@ -140,11 +140,11 @@ namespace gsc
 
 			if (function_id > (scr_func_max_id - 1))
 			{
-				console::error("in call to builtin method \"%s\"%s\n", xsk::gsc::iw5::resolver::method_name(function_id).data(), error.data());
+				console::error("in call to builtin method \"%s\"%s\n", gsc::cxt->meth_name(function_id).data(), error.data());
 			}
 			else
 			{
-				console::error("in call to builtin function \"%s\"%s\n", xsk::gsc::iw5::resolver::function_name(function_id).data(), error.data());
+				console::error("in call to builtin function \"%s\"%s\n", gsc::cxt->func_name(function_id).data(), error.data());
 			}
 		}
 

@@ -14,7 +14,7 @@ namespace utils
 	{
 		std::lock_guard _(this->mutex_);
 
-		for (auto& data : this->pool_)
+		for (const auto& data : this->pool_)
 		{
 			memory::free(data);
 		}
@@ -43,7 +43,7 @@ namespace utils
 	{
 		std::lock_guard _(this->mutex_);
 
-		const auto data = memory::allocate(length);
+		auto* data = memory::allocate(length);
 		this->pool_.push_back(data);
 		return data;
 	}
@@ -57,21 +57,21 @@ namespace utils
 	{
 		std::lock_guard _(this->mutex_);
 
-		const auto data = memory::duplicate_string(string);
+		auto* data = memory::duplicate_string(string);
 		this->pool_.push_back(data);
 		return data;
 	}
 
 	void* memory::allocate(const size_t length)
 	{
-		const auto data = std::calloc(length, 1);
+		auto* data = std::calloc(length, 1);
 		assert(data != nullptr);
 		return data;
 	}
 
 	char* memory::duplicate_string(const std::string& string)
 	{
-		const auto new_string = allocate_array<char>(string.size() + 1);
+		auto* new_string = allocate_array<char>(string.size() + 1);
 		std::memcpy(new_string, string.data(), string.size());
 		return new_string;
 	}
@@ -88,7 +88,7 @@ namespace utils
 
 	bool memory::is_set(const void* mem, const char chr, const size_t length)
 	{
-		const auto mem_arr = static_cast<const char*>(mem);
+		const auto* mem_arr = static_cast<const char*>(mem);
 
 		for (size_t i = 0; i < length; ++i)
 		{
