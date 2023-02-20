@@ -108,33 +108,42 @@ public:
 				{
 					console::info("%d %s\n", i, game::native::g_assetNames[i]);
 				}
-			}
-			else
-			{
-				const auto type = std::strtol(params.get(1), nullptr, 0);
 
-				if (type < 0 || type >= game::native::ASSET_TYPE_COUNT)
+				return;
+			}
+
+			int type;
+			try
+			{
+				type = std::stoi(params.get(1), nullptr, 0);
+			}
+			catch (const std::exception& ex)
+			{
+				console::error("Invalid pool passed. Got: %s, causing error: %s\n", params.get(1), ex.what());
+				return;
+			}
+
+			if (type < 0 || type >= game::native::ASSET_TYPE_COUNT)
+			{
+				console::error("Invalid pool number passed, must be between [%d, %d]\n", 0, game::native::ASSET_TYPE_COUNT - 1);
+				return;
+			}
+
+			console::info("Listing assets in pool %s\n", game::native::g_assetNames[type]);
+
+			const std::string filter = params.get(2);
+			enum_assets(type, [type, filter](game::native::XAssetHeader header)
+			{
+				const auto asset = game::native::XAsset{ type, header };
+				const auto* const asset_name = game::native::DB_GetXAssetName(&asset);
+
+				if (!filter.empty() && !utils::string::match_compare(filter, asset_name, false))
 				{
-					console::error("Invalid pool passed must be between [%d, %d]\n", 0, game::native::ASSET_TYPE_COUNT - 1);
 					return;
 				}
 
-				console::info("Listing assets in pool %s\n", game::native::g_assetNames[type]);
-
-				const std::string filter = params.get(2);
-				enum_assets(type, [type, filter](game::native::XAssetHeader header)
-				{
-					const auto asset = game::native::XAsset{ type, header };
-					const auto* const asset_name = game::native::DB_GetXAssetName(&asset);
-
-					if (!filter.empty() && !utils::string::match_compare(filter, asset_name, false))
-					{
-						return;
-					}
-
-					console::info("%s\n", asset_name);
-				}, true);
-			}
+				console::info("%s\n", asset_name);
+			}, true);
 		});
 	}
 
