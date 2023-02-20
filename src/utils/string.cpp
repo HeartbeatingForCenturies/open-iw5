@@ -36,6 +36,13 @@ namespace utils::string
 		return text;
 	}
 
+	bool match_compare(const std::string& input, const std::string& text, const bool exact)
+	{
+		if (exact && text == input) return true;
+		if (!exact && text.find(input) != std::string::npos) return true;
+		return false;
+	}
+
 	std::wstring convert(const std::string& str)
 	{
 		std::wstring result;

@@ -38,6 +38,12 @@ namespace game
 		typedef int (*DB_IsXAssetDefault_t)(XAssetType type, const char* name);
 		extern DB_IsXAssetDefault_t DB_IsXAssetDefault;
 
+		typedef void (*DB_EnumXAssets_t)(int type, void(*func)(XAssetHeader, void*), const void* inData, bool includeOverride);
+		extern DB_EnumXAssets_t DB_EnumXAssets;
+
+		typedef const char* (*DB_GetXAssetName_t)(const XAsset* asset);
+		extern DB_GetXAssetName_t DB_GetXAssetName;
+
 		typedef const dvar_t* (*Dvar_RegisterBool_t)(const char* dvarName, bool value, unsigned __int16 flags, const char* description);
 		extern Dvar_RegisterBool_t Dvar_RegisterBool;
 

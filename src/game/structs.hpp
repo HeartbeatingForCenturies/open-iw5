@@ -377,6 +377,7 @@ namespace game
 		enum XAssetType
 		{
 			ASSET_TYPE_SCRIPTFILE = 0x27,
+			ASSET_TYPE_COUNT = 0x2E,
 		};
 
 		struct ScriptFile
@@ -406,7 +407,7 @@ namespace game
 
 		struct XAsset
 		{
-			XAssetType type;
+			int type;
 			XAssetHeader header;
 		};
 

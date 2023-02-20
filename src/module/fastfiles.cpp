@@ -2,10 +2,12 @@
 #include <loader/module_loader.hpp>
 #include "game/game.hpp"
 
+#include "command.hpp"
 #include "console.hpp"
 
 #include <utils/hook.hpp>
 #include <utils/io.hpp>
+#include <utils/string.hpp>
 
 namespace
 {
@@ -76,6 +78,15 @@ namespace
 	}
 }
 
+void enum_assets(const int type, const std::function<void(game::native::XAssetHeader)>& callback, const bool include_override)
+{
+	game::native::DB_EnumXAssets(type, static_cast<void(*)(game::native::XAssetHeader, void*)>([](game::native::XAssetHeader header, void* data)
+	{
+		const auto& cb = *static_cast<std::function<void(game::native::XAssetHeader)>*>(data);
+		cb(header);
+	}), &callback, include_override);
+}
+
 class fastfiles final : public module
 {
 public:
@@ -86,6 +97,45 @@ public:
 		db_find_x_asset_header_hook.create(game::native::DB_FindXAssetHeader, &db_find_x_asset_header_stub);
 
 		g_dump_scripts = game::native::Dvar_RegisterBool("g_dumpScripts", false, game::native::DVAR_NONE, "Dump GSC scripts to binary format");
+
+		command::add("listassetpool", [](const command::params& params)
+		{
+			if (params.size() < 2)
+			{
+				console::info("listassetpool <poolnumber> [filter]: list all the assets in the specified pool\n");
+
+				for (auto i = 0; i < game::native::ASSET_TYPE_COUNT; ++i)
+				{
+					console::info("%d %s\n", i, game::native::g_assetNames[i]);
+				}
+			}
+			else
+			{
+				const auto type = std::strtol(params.get(1), nullptr, 0);
+
+				if (type < 0 || type >= game::native::ASSET_TYPE_COUNT)
+				{
+					console::error("Invalid pool passed must be between [%d, %d]\n", 0, game::native::ASSET_TYPE_COUNT - 1);
+					return;
+				}
+
+				console::info("Listing assets in pool %s\n", game::native::g_assetNames[type]);
+
+				const std::string filter = params.get(2);
+				enum_assets(type, [type, filter](game::native::XAssetHeader header)
+				{
+					const auto asset = game::native::XAsset{ type, header };
+					const auto* const asset_name = game::native::DB_GetXAssetName(&asset);
+
+					if (!filter.empty() && !utils::string::match_compare(filter, asset_name, false))
+					{
+						return;
+					}
+
+					console::info("%s\n", asset_name);
+				}, true);
+			}
+		});
 	}
 
 private:

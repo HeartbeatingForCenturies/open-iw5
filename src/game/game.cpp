@@ -18,6 +18,8 @@ namespace game
 		DB_LoadXAssets_t DB_LoadXAssets;
 		DB_FindXAssetHeader_t DB_FindXAssetHeader;
 		DB_IsXAssetDefault_t DB_IsXAssetDefault;
+		DB_EnumXAssets_t DB_EnumXAssets;
+		DB_GetXAssetName_t DB_GetXAssetName;
 
 		Dvar_RegisterBool_t Dvar_RegisterBool;
 		Dvar_RegisterFloat_t Dvar_RegisterFloat;
@@ -741,6 +743,8 @@ namespace game
 		native::DB_LoadXAssets = native::DB_LoadXAssets_t(SELECT_VALUE(0x48A8E0, 0x4CD020));
 		native::DB_FindXAssetHeader = native::DB_FindXAssetHeader_t(SELECT_VALUE(0x4FF000, 0x4CA620));
 		native::DB_IsXAssetDefault = native::DB_IsXAssetDefault_t(SELECT_VALUE(0x4868E0, 0x4CA800));
+		native::DB_EnumXAssets = native::DB_EnumXAssets_t(SELECT_VALUE(0x50A0D0, 0x4CA2D0));
+		native::DB_GetXAssetName = native::DB_GetXAssetName_t(SELECT_VALUE(0x438100, 0x4B7C10));
 
 		native::Dvar_RegisterBool = native::Dvar_RegisterBool_t(SELECT_VALUE(0x4914D0, 0x5BE9F0));
 		native::Dvar_RegisterFloat = native::Dvar_RegisterFloat_t(SELECT_VALUE(0x4F9CC0, 0x5BEA80));
