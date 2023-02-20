@@ -2,8 +2,6 @@
 #include <loader/module_loader.hpp>
 #include "game/game.hpp"
 
-#include "script_error.hpp"
-
 #include "module/console.hpp"
 
 #include <utils/hook.hpp>
