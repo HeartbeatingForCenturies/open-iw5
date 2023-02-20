@@ -158,7 +158,7 @@ namespace gsc
 			return game::native::DB_IsXAssetDefault(type, name);
 		}
 
-		void g_scr_load_scripts_stub()
+		void load_scripts()
 		{
 			char path[game::native::MAX_OSPATH]{};
 
@@ -201,8 +201,28 @@ namespace gsc
 					init_handles[path] = init_handle;
 				}
 			}
+		}
 
+		void g_scr_load_scripts_mp_stub()
+		{
+			load_scripts();
 			utils::hook::invoke<void>(0x523DA0);
+		}
+
+		__declspec(naked) void g_scr_load_script_and_label_stub()
+		{
+			static const DWORD GScr_LoadScriptAndLabel_t = 0x5D9900;
+
+			__asm
+			{
+				call GScr_LoadScriptAndLabel_t
+
+				pushad
+				call load_scripts
+				popad
+
+				ret
+			}
 		}
 
 		void scr_load_level_stub()
@@ -214,7 +234,7 @@ namespace gsc
 				game::native::Scr_FreeThread(static_cast<std::uint16_t>(id));
 			}
 
-			utils::hook::invoke<void>(0x517410); // Scr_LoadLevel
+			utils::hook::invoke<void>(SELECT_VALUE(0x50AF70, 0x517410)); // Scr_LoadLevel
 
 			for (const auto& handle : init_handles)
 			{
@@ -292,7 +312,10 @@ namespace gsc
 
 		void post_load() override
 		{
-			if (game::is_mp()) this->patch_mp();
+			if (game::is_sp()) this->patch_sp();
+			else this->patch_mp();
+
+			utils::hook(SELECT_VALUE(0x50C575, 0x50D4ED), scr_load_level_stub, HOOK_CALL).install()->quick();
 
 			// ProcessScript
 			utils::hook(SELECT_VALUE(0x44685E, 0x56B13E), find_script, HOOK_CALL).install()->quick();
@@ -312,10 +335,14 @@ namespace gsc
 			});
 		}
 
+		static void patch_sp()
+		{
+			utils::hook(0x4BE6A5, g_scr_load_script_and_label_stub, HOOK_CALL).install()->quick();
+		}
+
 		static void patch_mp()
 		{
-			utils::hook(0x523F3E, g_scr_load_scripts_stub, HOOK_CALL).install()->quick();
-			utils::hook(0x50D4ED, scr_load_level_stub, HOOK_CALL).install()->quick();
+			utils::hook(0x523F3E, g_scr_load_scripts_mp_stub, HOOK_CALL).install()->quick();
 		}
 	};
 }
