@@ -62,6 +62,7 @@ namespace game
 		Scr_GetFunctionHandle_t Scr_GetFunctionHandle;
 		Scr_ExecThread_t Scr_ExecThread;
 		Scr_FreeThread_t Scr_FreeThread;
+		Scr_RegisterFunction_t Scr_RegisterFunction;
 
 		GetObjectType_t GetObjectType;
 
@@ -788,6 +789,7 @@ namespace game
 		native::Scr_GetFunctionHandle = native::Scr_GetFunctionHandle_t(SELECT_VALUE(0x51DD50, 0x5618A0));
 		native::Scr_ExecThread = native::Scr_ExecThread_t(SELECT_VALUE(0x4FC590, 0x56E240));
 		native::Scr_FreeThread = native::Scr_FreeThread_t(SELECT_VALUE(0x51FD90, 0x569E20));
+		native::Scr_RegisterFunction = native::Scr_RegisterFunction_t(SELECT_VALUE(0x49E190, 0x561520));
 
 		native::GetObjectType = native::GetObjectType_t(SELECT_VALUE(0x4D8FE0, 0x565C60));
 

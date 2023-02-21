@@ -16,8 +16,6 @@
 
 namespace gsc
 {
-	std::uint16_t scr_func_max_id = 0x1C7;
-
 	namespace
 	{
 		utils::memory::allocator script_file_allocator;
@@ -69,7 +67,7 @@ namespace gsc
 			std::vector<std::uint8_t> stack_data;
 			stack_data.assign(decompressed_stack.begin(), decompressed_stack.end());
 
-			return {{script_file->bytecode, static_cast<std::uint32_t>(script_file->bytecodeLen)} , stack_data};
+			return { { script_file->bytecode, static_cast<std::uint32_t>(script_file->bytecodeLen) } , stack_data };
 		}
 
 		game::native::ScriptFile* load_custom_script(const char* file_name, const std::string& real_name)
@@ -100,7 +98,7 @@ namespace gsc
 				const auto script_file_ptr = static_cast<game::native::ScriptFile*>(script_file_allocator.allocate(sizeof(game::native::ScriptFile)));
 				script_file_ptr->name = file_name;
 
-				const auto compressed_stack = utils::compression::zlib::compress({reinterpret_cast<const char*>(output_script.second.data), output_script.second.size});
+				const auto compressed_stack = utils::compression::zlib::compress( {reinterpret_cast<const char*>(output_script.second.data), output_script.second.size} );
 				const auto byte_code_size = output_script.first.size + 1;
 
 				script_file_ptr->len = static_cast<int>(output_script.second.size);
@@ -269,7 +267,7 @@ namespace gsc
 				std::vector<std::uint8_t> script_data;
 				script_data.assign(file_buffer.begin(), file_buffer.end());
 
-				return {{}, script_data};
+				return { {}, script_data };
 			});
 
 			utils::hook::invoke<void>(SELECT_VALUE(0x4B4EE0, 0x561E80));

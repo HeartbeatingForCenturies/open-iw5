@@ -140,6 +140,9 @@ namespace game
 		typedef void (*Scr_FreeThread_t)(unsigned short handle);
 		extern Scr_FreeThread_t Scr_FreeThread;
 
+		typedef void (*Scr_RegisterFunction_t)(void* func, int type, unsigned int name);
+		extern Scr_RegisterFunction_t Scr_RegisterFunction;
+
 		typedef unsigned int(*GetObjectType_t)(unsigned int id);
 		extern GetObjectType_t GetObjectType;
 

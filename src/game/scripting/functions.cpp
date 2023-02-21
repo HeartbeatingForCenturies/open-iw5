@@ -1,6 +1,8 @@
 #include <std_include.hpp>
 #include "game/game.hpp"
 
+#include "module/gsc/script_extension.hpp"
+
 #include "functions.hpp"
 
 #include <utils/string.hpp>
@@ -67,10 +69,10 @@ namespace scripting
 
 	game::native::BuiltinFunction get_function_by_index(const std::uint32_t index)
 	{
-		static const auto function_table = SELECT_VALUE(0x186C68C, 0x1D6EB34);
-		static const auto method_table = SELECT_VALUE(0x184CDB0, 0x1D4F258);
+		auto** function_table = gsc::func_table;
+		auto** method_table = gsc::meth_table;
 
-		if (index < 0x1C7)
+		if (index < gsc::scr_func_max_id)
 		{
 			return reinterpret_cast<game::native::BuiltinFunction*>(function_table)[index - 1];
 		}
