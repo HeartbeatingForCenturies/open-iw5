@@ -32,8 +32,8 @@ namespace gsc
 
 		struct builtin_method
 		{
-			std::string name; // actual 'name'
-			std::uint16_t id;
+			std::string name;
+			std::uint16_t id; // actual 'name'
 			void(*actionFunc)(game::native::scr_entref_t);
 		};
 
