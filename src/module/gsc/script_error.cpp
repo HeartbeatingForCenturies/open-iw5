@@ -446,6 +446,17 @@ namespace gsc
 		return nullptr;
 	}
 
+	game::native::gentity_s* get_entity(game::native::scr_entref_t entref)
+	{
+		if (entref.classnum != 0)
+		{
+			scr_error("not an entity");
+			return nullptr;
+		}
+
+		return &game::native::g_entities[entref.entnum];
+	}
+
 	class error final : public module
 	{
 	public:

@@ -3,13 +3,16 @@
 #include "game/game.hpp"
 #include "game/dvars.hpp"
 
+#include "command.hpp"
+#include "console.hpp"
+#include "scheduler.hpp"
+#include "test_clients.hpp"
+
+#include "gsc/script_error.hpp"
+#include "gsc/script_extension.hpp"
+
 #include <utils/hook.hpp>
 #include <utils/string.hpp>
-
-#include "test_clients.hpp"
-#include "command.hpp"
-#include "scheduler.hpp"
-#include "console.hpp"
 
 bool test_clients::can_add()
 {
@@ -72,7 +75,7 @@ game::native::gentity_s* test_clients::sv_add_test_client()
 
 		if (game::native::mp::svs_clients[idx].header.netchan.remoteAddress.type == adr.type
 			&& game::native::mp::svs_clients[idx].header.netchan.remoteAddress.port == adr.port)
-			break; // Found them
+			break; // Found the bot
 	}
 
 	if (idx == *game::native::svs_clientCount)
@@ -228,6 +231,18 @@ void test_clients::patch_mp()
 
 	// Replace nullsubbed gsc func "GScr_AddTestClient" with our spawn
 	utils::hook::set<void(*)()>(0x8AC8DC, gscr_add_test_client);
+
+	gsc::register_method("IsTestClient", [](const game::native::scr_entref_t entref)
+	{
+		gsc::get_entity(entref);
+
+		if (game::native::g_entities[entref.entnum].client == nullptr)
+		{
+			gsc::scr_error("IsTestClient: entity must be a player entity");
+		}
+
+		game::native::Scr_AddInt(game::native::SV_IsTestClient(entref.entnum));
+	});
 }
 
 REGISTER_MODULE(test_clients);
