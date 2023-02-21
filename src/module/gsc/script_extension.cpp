@@ -160,7 +160,7 @@ namespace gsc
 	{
 		const auto lowered_name = utils::string::to_lower(name);
 
-		constexpr auto is_duplicate = [](const std::string s)
+		constexpr auto is_duplicate = [](const std::string& s)
 		{
 			return [s](const builtin_function& f) { return s == f.name; };
 		};
@@ -180,7 +180,7 @@ namespace gsc
 	{
 		const auto lowered_name = utils::string::to_lower(name);
 
-		constexpr auto is_duplicate = [](const std::string s)
+		constexpr auto is_duplicate = [](const std::string& s)
 		{
 			return [s](const builtin_method& m) { return s == m.name; };
 		};
