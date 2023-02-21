@@ -2,8 +2,8 @@
 
 namespace gsc
 {
-	extern void* func_table[500];
-	extern void* meth_table[900];
+	extern void* func_table[1000];
+	extern void* meth_table[1000];
 
 	extern std::uint16_t scr_func_max_id;
 

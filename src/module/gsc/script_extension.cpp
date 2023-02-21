@@ -18,8 +18,8 @@ namespace gsc
 	std::uint16_t scr_func_max_id = 0x1C7;
 	std::uint16_t scr_meth_max_id = 0x830C;
 
-	void* func_table[500];
-	void* meth_table[900];
+	void* func_table[1000];
+	void* meth_table[1000];
 
 	namespace
 	{
@@ -32,7 +32,7 @@ namespace gsc
 
 		struct builtin_method
 		{
-			std::string name;
+			std::string name; // actual 'name'
 			std::uint16_t id;
 			void(*actionFunc)(game::native::scr_entref_t);
 		};
