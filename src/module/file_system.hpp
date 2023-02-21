@@ -11,4 +11,5 @@ public:
 	static int write(const char* buffer, int len, int h);
 
 	static char** list_files(const char* path, const char* extension, game::native::FsListBehavior_e behavior, int* numfiles, int allocTrackType);
+	static void free_file_list(char** list);
 };

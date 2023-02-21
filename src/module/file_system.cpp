@@ -632,6 +632,16 @@ char** file_system::list_files(const char* path, const char* extension, game::na
 	return game::native::FS_ListFilteredFiles(*game::native::fs_searchpaths, path, extension, nullptr, behavior, numfiles, allocTrackType);
 }
 
+void file_system::free_file_list(char** list)
+{
+	if (!list)
+	{
+		return;
+	}
+	--list;
+	game::native::Hunk_UserDestroy(reinterpret_cast<game::native::HunkUser*>(*list));
+}
+
 void file_system::post_load()
 {
 	fs_homepath = reinterpret_cast<const game::native::dvar_t**>(SELECT_VALUE(0x1C2B538, 0x59ADD18));

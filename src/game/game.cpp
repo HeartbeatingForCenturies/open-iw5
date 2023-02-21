@@ -78,6 +78,8 @@ namespace game
 		Hunk_AllocateTempMemoryHighInternal_t Hunk_AllocateTempMemoryHighInternal;
 		Hunk_FreeTempMemory_t Hunk_FreeTempMemory;
 
+		Hunk_UserDestroy_t Hunk_UserDestroy;
+
 		VM_Notify_t VM_Notify;
 
 		BG_NetDataChecksum_t BG_NetDataChecksum;
@@ -804,6 +806,8 @@ namespace game
 
 		native::Hunk_AllocateTempMemoryHighInternal = native::Hunk_AllocateTempMemoryHighInternal_t(SELECT_VALUE(0x517870, 0x5B6C60));
 		native::Hunk_FreeTempMemory = native::Hunk_FreeTempMemory_t(SELECT_VALUE(0x434A40, 0x5B6F90));
+
+		native::Hunk_UserDestroy = native::Hunk_UserDestroy_t(SELECT_VALUE(0x50FE20, 0x5B7520));
 
 		native::VM_Notify = native::VM_Notify_t(SELECT_VALUE(0x610200, 0x569720));
 

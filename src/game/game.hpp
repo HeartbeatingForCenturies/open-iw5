@@ -173,6 +173,9 @@ namespace game
 		typedef void (*Hunk_FreeTempMemory_t)(void* buf);
 		extern Hunk_FreeTempMemory_t Hunk_FreeTempMemory;
 
+		typedef void (*Hunk_UserDestroy_t)(HunkUser* user);
+		extern Hunk_UserDestroy_t Hunk_UserDestroy;
+
 		typedef void (*VM_Notify_t)(unsigned int notifyListOwnerId, unsigned int stringValue, VariableValue* top);
 		extern VM_Notify_t VM_Notify;
 

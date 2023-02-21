@@ -1,6 +1,7 @@
 #include <std_include.hpp>
 #include <loader/module_loader.hpp>
 #include "game/game.hpp"
+#include "game/dvars.hpp"
 
 #include "script_loading.hpp"
 
@@ -11,6 +12,7 @@
 #include <utils/compression.hpp>
 #include <utils/hook.hpp>
 #include <utils/memory.hpp>
+#include <utils/string.hpp>
 
 #include <gsc_interface.hpp>
 
@@ -156,19 +158,23 @@ namespace gsc
 			return game::native::DB_IsXAssetDefault(type, name);
 		}
 
-		void load_scripts()
+		void load_scripts_from_folder(const char* dir)
 		{
 			char path[game::native::MAX_OSPATH]{};
+			char search_path[game::native::MAX_OSPATH]{};
+
+			strncpy_s(search_path, dir, _TRUNCATE);
+			strncat_s(search_path, "/", _TRUNCATE);
 
 			auto num_files = 0;
-			auto** files = file_system::list_files("scripts/", "gsc", game::native::FS_LIST_ALL, &num_files, 10);
+			auto** list = file_system::list_files(search_path, "gsc", game::native::FS_LIST_ALL, &num_files, 10);
 
 			for (auto i = 0; i < num_files; ++i)
 			{
-				const auto* script_file = files[i];
+				const auto* script_file = list[i];
 				console::info("Loading script %s...\n", script_file);
 
-				const auto len = sprintf_s(path, "%s/%s", "scripts", script_file);
+				const auto len = sprintf_s(path, "%s/%s", dir, script_file);
 				if (len == -1)
 				{
 					continue;
@@ -199,6 +205,18 @@ namespace gsc
 					init_handles[path] = init_handle;
 				}
 			}
+
+			file_system::free_file_list(list);
+		}
+
+		void load_scripts()
+		{
+			// Both SP & MP
+			load_scripts_from_folder("scripts");
+
+			// Game specific
+			const auto* game_dir = game::is_mp() ? "scripts/mp" : "scripts/sp";
+			load_scripts_from_folder(game_dir);
 		}
 
 		void g_scr_load_scripts_mp_stub()

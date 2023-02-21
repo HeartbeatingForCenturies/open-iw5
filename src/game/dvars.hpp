@@ -5,6 +5,8 @@ namespace dvars
 	extern const game::native::dvar_t** com_sv_running;
 
 	extern const game::native::dvar_t** sv_maxclients;
+	extern const game::native::dvar_t** sv_g_gametype;
+	extern const game::native::dvar_t** sv_mapname;
 
 	extern const game::native::dvar_t** loc_language;
 

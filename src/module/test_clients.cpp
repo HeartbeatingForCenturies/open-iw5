@@ -163,8 +163,8 @@ __declspec(naked) void test_clients::reset_reliable_mp()
 
 bool test_clients::check_timeouts(const game::native::mp::client_t* client)
 {
-	return (!client->bIsTestClient || client->header.state == game::native::clientState_t::CS_ZOMBIE) &&
-		client->header.netchan.remoteAddress.type != game::native::netadrtype_t::NA_LOOPBACK;
+	return (!client->bIsTestClient || client->header.state == game::native::CS_ZOMBIE) &&
+		client->header.netchan.remoteAddress.type != game::native::NA_LOOPBACK;
 }
 
 __declspec(naked) void test_clients::check_timeouts_stub_mp()
