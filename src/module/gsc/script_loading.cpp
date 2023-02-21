@@ -1,7 +1,6 @@
 #include <std_include.hpp>
 #include <loader/module_loader.hpp>
 #include "game/game.hpp"
-#include "game/dvars.hpp"
 
 #include "script_loading.hpp"
 
@@ -12,7 +11,6 @@
 #include <utils/compression.hpp>
 #include <utils/hook.hpp>
 #include <utils/memory.hpp>
-#include <utils/string.hpp>
 
 #include <gsc_interface.hpp>
 
