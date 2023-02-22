@@ -31,6 +31,7 @@ private:
 	static const game::native::dvar_t* g_speed;
 
 	static DWORD bounce_addr;
+	static DWORD all_angles_bounce_addr;
 	static DWORD dont_bounce_addr;
 	static DWORD pm_project_velocity_addr;
 	static DWORD pm_end_sprint_addr;

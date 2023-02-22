@@ -26,6 +26,7 @@ const game::native::dvar_t* player_movement::bg_gravity;
 const game::native::dvar_t* player_movement::g_speed;
 
 DWORD player_movement::bounce_addr;
+DWORD player_movement::all_angles_bounce_addr;
 DWORD player_movement::dont_bounce_addr;
 DWORD player_movement::pm_project_velocity_addr;
 DWORD player_movement::pm_end_sprint_addr;
@@ -56,13 +57,22 @@ __declspec(naked) void player_movement::pm_step_slide_move_stub()
 
 		// Code hook skipped
 		cmp dword ptr [esp + 0x24], 0
-		jnz dont_bounce
+		jmp dont_bounce_addr
 
 	bounce:
+		push eax
+		mov eax, pm_bouncesAllAngles
+		cmp byte ptr [eax + 0xC], 1
+		pop eax
+
+		je all_angles_bounce
+
+		// Regular bounce
 		jmp bounce_addr
 
-	dont_bounce:
-		jmp dont_bounce_addr
+	all_angles_bounce:
+		// Patch for all angles
+		jmp all_angles_bounce_addr
 	}
 }
 
@@ -373,15 +383,15 @@ __declspec(naked) void player_movement::pm_project_velocity_stub()
 		cmp byte ptr [eax + 0xC], 1
 		pop eax
 
-		je bounce
+		je force_bounce
 
 		fstp ST(0)
 		pop esi
 		add esp, 0x10
 		retn
 
-	bounce:
-		jmp dont_bounce_addr
+	force_bounce:
+		jmp pm_project_velocity_addr
 	}
 }
 
@@ -688,8 +698,9 @@ void player_movement::post_load()
 	utils::hook::set<BYTE>(SELECT_VALUE(0x44DFED, 0x50DDDD), 0x0);
 
 	bounce_addr = SELECT_VALUE(0x43D91F, 0x424D58);
-	dont_bounce_addr = SELECT_VALUE(0x43D933, 0x424D6C);
-	pm_project_velocity_addr = SELECT_VALUE(0x4A57Ef, 0x41D19F);
+	all_angles_bounce_addr = SELECT_VALUE(0x43D968, 0x424DA1);
+	dont_bounce_addr = SELECT_VALUE(0x43D91D, 0x424D56);
+	pm_project_velocity_addr = SELECT_VALUE(0x4A57EF, 0x41D19F);
 	pm_end_sprint_addr = SELECT_VALUE(0x0, 0x41D350);
 	push_off_ladder_addr = SELECT_VALUE(0x63EA4C, 0x41686C);
 	jump_start_addr = SELECT_VALUE(0x63E910, 0x4166F6);
