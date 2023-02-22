@@ -13,19 +13,19 @@
 const game::native::dvar_t* game_log::g_log;
 const game::native::dvar_t* game_log::g_logSync;
 
-int game_log::log_file = 0;
+int game_log::log_file_ = 0;
 
 void game_log::g_log_printf(const char* fmt, ...)
 {
-	char buf[1024] = {0};
-	char out[1024] = {0};
+	char buf[1024]{};
+	char out[1024]{};
 
 	va_list va;
 	va_start(va, fmt);
 	vsnprintf_s(buf, _TRUNCATE, fmt, va);
 	va_end(va);
 
-	if (!log_file)
+	if (!log_file_)
 	{
 		return;
 	}
@@ -33,12 +33,12 @@ void game_log::g_log_printf(const char* fmt, ...)
 	const auto time = game::native::mp::level->time / 1000;
 	const auto len = sprintf_s(out, "%3i:%i%i %s", time / 60, time % 60 / 10, time % 60 % 10, buf);
 
-	file_system::write(out, len, log_file);
+	file_system::write(out, len, log_file_);
 }
 
 void game_log::gscr_log_print()
 {
-	char buf[1024] = {0};
+	char buf[1024]{};
 	std::size_t out_chars = 0;
 
 	for (std::size_t i = 0; i < game::native::Scr_GetNumParam(); ++i)
@@ -67,15 +67,15 @@ void game_log::g_init_game_stub()
 
 	const auto* log = g_log->current.string;
 
-	if (*log == '\0')
+	if (!*log)
 	{
 		console::info("Not logging to disk.\n");
 	}
 	else
 	{
-		file_system::open_file_by_mode(log, &log_file, game::native::FS_APPEND_SYNC);
+		file_system::open_file_by_mode(log, &log_file_, game::native::FS_APPEND_SYNC);
 
-		if (!log_file)
+		if (!log_file_)
 		{
 			console::info("WARNING: Couldn't open logfile: %s\n", log);
 		}
@@ -94,13 +94,13 @@ void game_log::g_shutdown_game_stub(int free_scripts)
 {
 	console::info("==== ShutdownGame (%d) ====\n", free_scripts);
 
-	if (log_file)
+	if (log_file_)
 	{
 		g_log_printf("ShutdownGame:\n");
 		g_log_printf("------------------------------------------------------------\n");
 
-		game::native::FS_FCloseFile(log_file);
-		log_file = 0;
+		game::native::FS_FCloseFile(log_file_);
+		log_file_ = 0;
 	}
 
 	utils::hook::invoke<void>(0x50C100, free_scripts);
