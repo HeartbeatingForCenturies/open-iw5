@@ -98,7 +98,7 @@ namespace gsc
 				const auto script_file_ptr = static_cast<game::native::ScriptFile*>(script_file_allocator.allocate(sizeof(game::native::ScriptFile)));
 				script_file_ptr->name = file_name;
 
-				const auto compressed_stack = utils::compression::zlib::compress( {reinterpret_cast<const char*>(output_script.second.data), output_script.second.size} );
+				const auto compressed_stack = utils::compression::zlib::compress({ reinterpret_cast<const char*>(output_script.second.data), output_script.second.size });
 				const auto byte_code_size = output_script.first.size + 1;
 
 				script_file_ptr->len = static_cast<int>(output_script.second.size);
