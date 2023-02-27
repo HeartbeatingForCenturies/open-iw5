@@ -4,14 +4,13 @@
 
 #include "script_extension.hpp"
 #include "script_error.hpp"
+#include "script_loading.hpp"
 
 #include "module/console.hpp"
 #include "module/scripting.hpp"
 
 #include <utils/hook.hpp>
 #include <utils/string.hpp>
-
-#include <gsc_interface.hpp>
 
 namespace gsc
 {
@@ -173,7 +172,7 @@ namespace gsc
 
 		++scr_func_max_id;
 		custom_functions.push_back({ lowered_name, scr_func_max_id, func });
-		cxt->func_add(lowered_name, scr_func_max_id);
+		gsc_ctx->func_add(lowered_name, scr_func_max_id);
 	}
 
 	void register_method(const std::string& name, const game::native::BuiltinMethod& meth)
@@ -193,7 +192,7 @@ namespace gsc
 
 		++scr_meth_max_id;
 		custom_methods.push_back({ lowered_name, scr_meth_max_id, meth });
-		cxt->meth_add(lowered_name, scr_meth_max_id);
+		gsc_ctx->meth_add(lowered_name, scr_meth_max_id);
 	}
 
 	const char* get_code_pos(int index)

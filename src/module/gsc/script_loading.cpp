@@ -12,10 +12,10 @@
 #include <utils/hook.hpp>
 #include <utils/memory.hpp>
 
-#include <gsc_interface.hpp>
-
 namespace gsc
 {
+	std::unique_ptr<xsk::gsc::iw5_pc::context> gsc_ctx;
+
 	namespace
 	{
 		utils::memory::allocator script_file_allocator;
@@ -80,8 +80,8 @@ namespace gsc
 
 			try
 			{
-				auto& compiler = gsc::cxt->compiler();
-				auto& assembler = gsc::cxt->assembler();
+				auto& compiler = gsc_ctx->compiler();
+				auto& assembler = gsc_ctx->assembler();
 
 				std::string source_buffer;
 				if (!read_raw_script_file(real_name + ".gsc", &source_buffer))
@@ -128,7 +128,7 @@ namespace gsc
 
 		std::string get_script_file_name(const std::string& name)
 		{
-			const auto id = gsc::cxt->token_id(name);
+			const auto id = gsc_ctx->token_id(name);
 			if (!id)
 			{
 				return name;
@@ -190,14 +190,14 @@ namespace gsc
 
 				console::info("Script %s.gsc loaded successfully\n", path);
 
-				const auto main_handle = game::native::Scr_GetFunctionHandle(path, static_cast<std::uint16_t>(gsc::cxt->token_id("main")));
+				const auto main_handle = game::native::Scr_GetFunctionHandle(path, static_cast<std::uint16_t>(gsc_ctx->token_id("main")));
 				if (main_handle)
 				{
 					console::info("Loaded '%s::main'\n", path);
 					main_handles[path] = main_handle;
 				}
 
-				const auto init_handle = game::native::Scr_GetFunctionHandle(path, static_cast<std::uint16_t>(gsc::cxt->token_id("init")));
+				const auto init_handle = game::native::Scr_GetFunctionHandle(path, static_cast<std::uint16_t>(gsc_ctx->token_id("init")));
 				if (init_handle)
 				{
 					console::info("Loaded '%s::init'\n", path);
@@ -265,7 +265,7 @@ namespace gsc
 				xsk::gsc::build::dev :
 				xsk::gsc::build::prod;
 
-			gsc::cxt->init(comp_mode, [](const std::string& include_name) -> std::pair<xsk::gsc::buffer, std::vector<std::uint8_t>>
+			gsc_ctx->init(comp_mode, [](const std::string& include_name) -> std::pair<xsk::gsc::buffer, std::vector<std::uint8_t>>
 			{
 				const auto real_name = get_raw_script_file_name(include_name);
 
@@ -293,7 +293,7 @@ namespace gsc
 		void scr_end_load_scripts_stub()
 		{
 			// Cleanup the compiler
-			gsc::cxt->cleanup();
+			gsc_ctx->cleanup();
 
 			utils::hook::invoke<void>(SELECT_VALUE(0x5DF010, 0x561D00));
 		}
@@ -305,7 +305,7 @@ namespace gsc
 		const auto id = static_cast<std::uint16_t>(std::strtol(name, nullptr, 10));
 		if (id)
 		{
-			real_name = gsc::cxt->token_name(id);
+			real_name = gsc_ctx->token_name(id);
 		}
 
 		auto* script = load_custom_script(name, real_name);
@@ -322,7 +322,7 @@ namespace gsc
 	public:
 		void post_start() override
 		{
-			gsc::cxt = std::make_unique<xsk::gsc::iw5_pc::context>();
+			gsc_ctx = std::make_unique<xsk::gsc::iw5_pc::context>();
 		}
 
 		void post_load() override

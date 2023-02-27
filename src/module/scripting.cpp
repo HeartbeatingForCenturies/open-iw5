@@ -2,9 +2,9 @@
 #include <loader/module_loader.hpp>
 #include "game/game.hpp"
 
-#include <utils/hook.hpp>
+#include "scripting.hpp"
 
-#include "game/scripting/functions.hpp"
+#include <utils/hook.hpp>
 
 #include "gsc/script_loading.hpp"
 
@@ -22,11 +22,6 @@ namespace scripting
 		std::string current_script_file;
 
 		std::vector<std::function<void(int)>> shutdown_callbacks;
-
-		std::string get_token(unsigned int id)
-		{
-			return find_token(id);
-		}
 
 		void add_function_sort(unsigned int id, const char* pos)
 		{
@@ -109,6 +104,11 @@ namespace scripting
 				callback(free_scripts);
 			}
 		}
+	}
+
+	std::string find_token(std::uint32_t id)
+	{
+		return gsc::gsc_ctx->token_name(id);
 	}
 
 	std::string get_token(unsigned int id)

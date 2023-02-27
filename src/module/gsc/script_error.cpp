@@ -4,14 +4,13 @@
 
 #include "script_error.hpp"
 #include "script_loading.hpp"
+#include "script_extension.hpp"
 
 #include "module/console.hpp"
 #include "module/scripting.hpp"
 
 #include <utils/hook.hpp>
 #include <utils/string.hpp>
-
-#include <gsc_interface.hpp>
 
 using namespace utils::string;
 
@@ -124,8 +123,8 @@ namespace gsc
 		{
 			try
 			{
-				const auto index = gsc::cxt->opcode_enum(opcode);
-				return {gsc::cxt->opcode_name(index)};
+				const auto index = gsc_ctx->opcode_enum(opcode);
+				return {gsc_ctx->opcode_name(index)};
 			}
 			catch (...)
 			{
@@ -140,11 +139,11 @@ namespace gsc
 
 			if (function_id > (scr_func_max_id - 1))
 			{
-				console::error("in call to builtin method \"%s\"%s\n", gsc::cxt->meth_name(function_id).data(), error.data());
+				console::error("in call to builtin method \"%s\"%s\n", gsc_ctx->meth_name(function_id).data(), error.data());
 			}
 			else
 			{
-				console::error("in call to builtin function \"%s\"%s\n", gsc::cxt->func_name(function_id).data(), error.data());
+				console::error("in call to builtin function \"%s\"%s\n", gsc_ctx->func_name(function_id).data(), error.data());
 			}
 		}
 
