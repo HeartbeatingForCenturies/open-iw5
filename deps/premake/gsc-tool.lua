@@ -10,10 +10,6 @@ end
 function gsc_tool.includes()
 	includedirs {
 		gsc_tool.source,
-		path.join(gsc_tool.source, "iw5"),
-		path.join(gsc_tool.source, "utils"),
-		path.join(gsc_tool.source, "gsc"),
-		path.join(dependencies.basePath, "gsc-tool/include"),
 	}
 end
 
@@ -44,7 +40,6 @@ function gsc_tool.project()
 
 		files {
 			path.join(gsc_tool.source, "stdinc.hpp"),
-			path.join(gsc_tool.source, "stdinc.cpp"),
 
 			path.join(gsc_tool.source, "iw5/iw5_pc.hpp"),
 			path.join(gsc_tool.source, "iw5/iw5_pc.cpp"),
@@ -61,7 +56,6 @@ function gsc_tool.project()
 
 		includedirs {
 			gsc_tool.source,
-			path.join(gsc_tool.source, "iw5"),
 		}
 end
 

@@ -1,6 +1,5 @@
 #pragma once
-#define XSK_GSC_IW5_PC
-#include <gsc_api.hpp>
+#include <iw5/iw5_pc.hpp>
 
 namespace gsc
 {
