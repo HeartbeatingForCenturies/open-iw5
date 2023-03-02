@@ -55,7 +55,7 @@ game::native::gentity_s* test_clients::sv_add_test_client()
 		game::native::LiveStorage_GetPersistentDataDefVersion(), game::native::LiveStorage_GetPersistentDataDefFormatChecksum(), bot_port);
 
 	game::native::netadr_s adr;
-	std::memset(&adr, 0, sizeof(game::native::netadr_s));
+	ZeroMemory(&adr, sizeof(game::native::netadr_s));
 
 	game::native::SV_Cmd_TokenizeString(user_info);
 
