@@ -304,7 +304,7 @@ __declspec(naked) void player_movement::jump_get_land_factor_stub()
 
 __declspec(naked) void player_movement::pm_crash_land_stub_mp()
 {
-	static DWORD func = 0x41E6B0;
+	static const DWORD PM_CrashLand_t = 0x41E6B0;
 
 	__asm
 	{
@@ -317,7 +317,7 @@ __declspec(naked) void player_movement::pm_crash_land_stub_mp()
 		jz skip_crash
 
 		// Arguments are in the registers
-		call func
+		call PM_CrashLand_t
 
 	skip_crash:
 		ret
@@ -326,7 +326,7 @@ __declspec(naked) void player_movement::pm_crash_land_stub_mp()
 
 __declspec(naked) void player_movement::pm_crash_land_stub_sp()
 {
-	static DWORD func = 0x6405A0;
+	static const DWORD PM_CrashLand_t = 0x6405A0;
 
 	__asm
 	{
@@ -340,7 +340,7 @@ __declspec(naked) void player_movement::pm_crash_land_stub_sp()
 
 		// ps is in the esi register
 		push [esp + 0x4] // pml
-		call func
+		call PM_CrashLand_t
 		add esp, 4
 
 	skip_crash:
