@@ -10,7 +10,7 @@ namespace utils::nt
 
 	library library::load(const std::filesystem::path& path)
 	{
-		return library::load(path.generic_string());
+		return library(LoadLibraryW(path.generic_wstring().data()));
 	}
 
 	library library::get_by_address(void* address)

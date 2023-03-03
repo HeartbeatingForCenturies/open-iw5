@@ -34,7 +34,7 @@ public:
 				this->start_mod("\xF0\x9F\x90\x8D Open-IW5 Multiplayer", 42690);
 			}
 		}
-		catch (std::exception& e)
+		catch (const std::exception& e)
 		{
 			printf("Steam: %s\n", e.what());
 		}
