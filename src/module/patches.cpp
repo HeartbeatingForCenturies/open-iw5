@@ -8,17 +8,6 @@
 
 namespace
 {
-	__declspec(noreturn) void long_jump_stub(jmp_buf buf, const int value) noexcept(false)
-	{
-#ifdef _DEBUG
-		{
-			printf("Unwinding the stack...\n");
-		}
-#endif
-
-		longjmp(buf, value);
-	}
-
 	const game::native::dvar_t* dvar_register_com_max_fps(const char* dvarName, int value,
 		int min, int /*max*/, unsigned __int16 /*flags*/, const char* description)
 	{
@@ -77,8 +66,6 @@ public:
 
 		if (game::is_sp()) this->patch_sp();
 		else if (game::is_mp()) this->patch_mp();
-
-		utils::hook(game::native::_longjmp, long_jump_stub, HOOK_JUMP).install()->quick();
 	}
 
 private:
@@ -111,6 +98,13 @@ private:
 
 		// Remove "me_pictureframes" censorship
 		utils::hook::set<std::uint8_t>(0x4149C3, 0xEB);
+
+		utils::hook::nop(0x691ECB, 5); // RB_EndFrame
+		utils::hook::nop(0x492812, 5); // R_SyncGpu
+
+		// Disable MSPing_Init
+		utils::hook::nop(0x42AD45, 5);
+		utils::hook::set<std::uint8_t>(0x4BAB37, 0xEB);
 	}
 
 	void patch_mp() const
@@ -139,6 +133,13 @@ private:
 
 		// Remove "me_pictureframes" censorship
 		utils::hook::set<std::uint8_t>(0x4CC493, 0xEB);
+
+		utils::hook::nop(0x696972, 5); // RB_EndFrame
+		utils::hook::nop(0x66F5C2, 5); // R_SyncGpu
+
+		// Disable MSPing_Init
+		utils::hook::nop(0x5CB417, 5);
+		utils::hook::set<std::uint8_t>(0x5CB857, 0xEB);
 	}
 
 	void patch_dedi() const
