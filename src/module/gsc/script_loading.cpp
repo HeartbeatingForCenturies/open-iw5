@@ -263,9 +263,9 @@ namespace gsc
 
 		void scr_begin_load_scripts_stub()
 		{
-			const auto comp_mode = developer_script->current.enabled ?
-				xsk::gsc::build::dev :
-				xsk::gsc::build::prod;
+			const auto comp_mode = developer_script->current.enabled
+				? xsk::gsc::build::dev
+				: xsk::gsc::build::prod;
 
 			gsc_ctx->init(comp_mode, [](const std::string& include_name) -> std::pair<xsk::gsc::buffer, std::vector<std::uint8_t>>
 			{
