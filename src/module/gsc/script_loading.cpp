@@ -92,6 +92,8 @@ namespace gsc
 				std::vector<std::uint8_t> data;
 				data.assign(source_buffer.begin(), source_buffer.end());
 
+				console::info("Compiling rawfile '%s'\n", real_name.data());
+
 				const auto assembly_ptr = compiler.compile(real_name, data);
 				// Pair of two buffers. First is the byte code and second is the stack
 				const auto output_script = assembler.assemble(*assembly_ptr);
