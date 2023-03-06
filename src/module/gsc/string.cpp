@@ -19,7 +19,7 @@ namespace gsc
 
 				if (!str)
 				{
-					scr_error("^GetChar: Illegal parameter!\n");
+					scr_error("^GetChar: Illegal parameter!");
 					return;
 				}
 
