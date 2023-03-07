@@ -77,7 +77,7 @@ namespace
 				*dst++ = *src;
 			}
 		}
-		*dst = 0;
+		*dst = '\0';
 	}
 
 	void build_os_path_for_thread(const char* base, const char* game, const char* qpath, char* ospath, game::native::FsThread thread)
