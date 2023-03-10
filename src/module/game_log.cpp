@@ -125,6 +125,8 @@ void game_log::post_load()
 
 	utils::hook(0x50D5F4, exit_level_stub, HOOK_JUMP).install()->quick();
 
+	utils::hook(0x50ACCE, g_log_printf, HOOK_CALL).install()->quick();
+
 	scheduler::once([]
 	{
 		g_log = game::native::Dvar_RegisterString("g_log", "games_mp.log",
