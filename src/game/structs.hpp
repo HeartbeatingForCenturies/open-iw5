@@ -989,6 +989,8 @@ namespace game
 		};
 
 		static_assert(sizeof(playerState_s) == 0x330C);
+		static_assert(offsetof(playerState_s, gravity) == 0x58);
+		static_assert(offsetof(playerState_s, speed) == 0x5C);
 
 		struct pmove_t
 		{

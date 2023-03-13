@@ -75,11 +75,28 @@ void ceg::post_load()
 		}
 	});
 
+	signature.add({
+		"\x77\x00\x8B\x55\x08\x3B\x17\x0F\x82\x00\x00\x00\x00", "x?xxxxxxx????", [](char* address)
+		{
+			utils::hook::nop(address + 7, 6);
+		}
+	});
+
+	signature.add({
+		"\x8D\x4D\x00\xE8\x00\x00\x00\x00\x84\xC0\x74\x13\x53", "xx?x????xxxxx", [](char* address)
+		{
+			utils::hook::set<std::uint8_t>(address + 10, 0xEB);
+		}
+	});
+
 	signature.process();
 
 	// Checks on startup
 	utils::hook::set<std::uint32_t>(0x402ED0, 0xC301B0);
-	utils::hook::set<std::uint32_t>(0x4b9280, 0xC301B0);
+	utils::hook::set<std::uint32_t>(0x4B9280, 0xC301B0);
+
+	utils::hook(0x4CA310, 0x48A8E0, HOOK_JUMP).install()->quick();
+	utils::hook(0x4D0020, 0x41ECE0, HOOK_JUMP).install()->quick();
 
 	// Function fixup
 	utils::hook(0x4CA310, game::native::DB_LoadXAssets, HOOK_JUMP).install()->quick();
