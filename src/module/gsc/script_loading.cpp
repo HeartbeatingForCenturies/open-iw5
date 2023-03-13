@@ -122,7 +122,7 @@ namespace gsc
 			catch (const std::exception& ex)
 			{
 				console::error("*********** script compile error *************\n");
-				console::error("failed to compile '%s':\n%s", real_name.data(), ex.what());
+				console::error("failed to compile '%s':\n%s\n", real_name.data(), ex.what());
 				console::error("**********************************************\n");
 				return nullptr;
 			}
