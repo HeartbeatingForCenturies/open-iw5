@@ -31,7 +31,7 @@ namespace
 
 	FILE* file_open_append_text(const char* filename)
 	{
-		errno = 0;
+		_set_errno(0);
 		auto* file = std::fopen(filename, "at");
 		if (file)
 		{
@@ -44,7 +44,7 @@ namespace
 
 	FILE* file_open_write_binary(const char* filename)
 	{
-		errno = 0;
+		_set_errno(0);
 		auto* file = std::fopen(filename, "wb");
 		if (file)
 		{
