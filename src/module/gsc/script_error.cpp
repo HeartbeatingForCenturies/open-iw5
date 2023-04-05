@@ -447,13 +447,33 @@ namespace gsc
 
 	game::native::gentity_s* get_entity(game::native::scr_entref_t entref)
 	{
-		if (entref.classnum != 0)
+		if (entref.classnum)
 		{
 			scr_error("not an entity");
 			return nullptr;
 		}
 
+		assert(entref.entnum < game::native::MAX_GENTITIES);
 		return &game::native::g_entities[entref.entnum];
+	}
+
+	game::native::gentity_s* get_player_entity(game::native::scr_entref_t entref)
+	{
+		if (entref.classnum)
+		{
+			scr_error("not an entity");
+			return nullptr;
+		}
+
+		assert(entref.entnum < game::native::MAX_GENTITIES);
+		auto* ent =  &game::native::g_entities[entref.entnum];
+		if (!ent->client)
+		{
+			scr_error(va("entity %i is not a player", entref.entnum));
+			return nullptr;
+		}
+
+		return ent;
 	}
 
 	class error final : public module

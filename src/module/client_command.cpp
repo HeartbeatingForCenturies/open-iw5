@@ -5,24 +5,16 @@
 #include "command.hpp"
 #include "scheduler.hpp"
 
+#include "gsc/script_error.hpp"
+
+#include <utils/hook.hpp>
 #include <utils/string.hpp>
 
-static const game::native::dvar_t* g_cheats;
-
-class client_command final : public module
+namespace
 {
-public:
-	void post_load() override
-	{
-		if (game::is_mp())
-		{
-			g_cheats = game::native::Dvar_RegisterBool("sv_cheats", true, game::native::DVAR_CODINFO, "Enable cheats");
-			add_mp_client_commands();
-		}
-	}
+	const game::native::dvar_t* g_cheats;
 
-private:
-	static bool cheats_ok(game::native::gentity_s* ent)
+	bool cheats_ok(game::native::gentity_s* ent)
 	{
 		if (!g_cheats->current.enabled)
 		{
@@ -41,7 +33,7 @@ private:
 		return true;
 	}
 
-	static bool cheats_ok_internal(game::native::sp::gentity_s* ent)
+	bool cheats_ok_internal(game::native::sp::gentity_s* ent)
 	{
 		if (ent->health < 1)
 		{
@@ -52,29 +44,61 @@ private:
 		return true;
 	}
 
+	void cmd_noclip_f(game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
+	{
+		if (!cheats_ok(ent))
+			return;
+
+		ent->client->flags ^= 1;
+
+		game::native::mp::SV_GameSendServerCommand(ent->s.number, game::native::SV_CMD_CAN_IGNORE,
+			utils::string::va("%c \"%s\"", 0x65, (ent->client->flags & 1) ? "GAME_NOCLIPON" : "GAME_NOCLIPOFF"));
+	}
+
+	void cmd_ufo_f(game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
+	{
+		if (!cheats_ok(ent))
+			return;
+
+		ent->client->flags ^= 2;
+
+		game::native::mp::SV_GameSendServerCommand(ent->s.number, game::native::SV_CMD_CAN_IGNORE,
+			utils::string::va("%c \"%s\"", 0x65, (ent->client->flags & 2) ? "GAME_UFOON" : "GAME_UFOOFF"));
+	}
+
+	void player_cmd_noclip(game::native::scr_entref_t entref)
+	{
+		auto* ent = gsc::get_player_entity(entref);
+		cmd_noclip_f(ent, command::params_sv{});
+	}
+
+	void player_cmd_ufo(game::native::scr_entref_t entref)
+	{
+		auto* ent = gsc::get_player_entity(entref);
+		cmd_ufo_f(ent, command::params_sv{});
+	}
+}
+
+class client_command final : public module
+{
+public:
+	void post_load() override
+	{
+		if (game::is_mp())
+		{
+			g_cheats = game::native::Dvar_RegisterBool("sv_cheats", true, game::native::DVAR_CODINFO, "Enable cheats");
+			add_mp_client_commands();
+
+			utils::hook::set<game::native::BuiltinMethod>(0x7FDBC8, player_cmd_noclip);
+			utils::hook::set<game::native::BuiltinMethod>(0x7FDBD4, player_cmd_ufo);
+		}
+	}
+
+private:
 	static void add_mp_client_commands()
 	{
-		command::add_sv("noclip", [](game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
-		{
-			if (!cheats_ok(ent))
-				return;
-
-			ent->client->flags ^= 1;
-
-			game::native::mp::SV_GameSendServerCommand(ent->s.number, game::native::SV_CMD_CAN_IGNORE,
-				utils::string::va("%c \"%s\"", 0x65, (ent->client->flags & 1) ? "GAME_NOCLIPON" : "GAME_NOCLIPOFF"));
-		});
-
-		command::add_sv("ufo", [](game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
-		{
-			if (!cheats_ok(ent))
-				return;
-
-			ent->client->flags ^= 2;
-
-			game::native::mp::SV_GameSendServerCommand(ent->s.number, game::native::SV_CMD_CAN_IGNORE,
-				utils::string::va("%c \"%s\"", 0x65, (ent->client->flags & 2) ? "GAME_UFOON" : "GAME_UFOOFF"));
-		});
+		command::add_sv("noclip", cmd_noclip_f);
+		command::add_sv("ufo", cmd_ufo_f);
 
 		command::add_sv("god", [](game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
 		{
