@@ -104,7 +104,7 @@ namespace gsc
 		void compile_error_stub(const char* code_pos, [[maybe_unused]] const char* msg)
 		{
 			get_unknown_function_error(code_pos);
-			game::native::Com_Error(game::native::ERR_DROP, "script link error\n%s", unknown_function_error.data());
+			game::native::Com_Error(game::native::ERR_SCRIPT_DROP, "script link error\n%s", unknown_function_error.data());
 		}
 
 		unsigned int find_variable_stub(unsigned int parent_id, unsigned int thread_name)
@@ -113,7 +113,7 @@ namespace gsc
 			if (!res)
 			{
 				get_unknown_function_error(thread_name);
-				game::native::Com_Error(game::native::ERR_DROP, "script link error\n%s", unknown_function_error.data());
+				game::native::Com_Error(game::native::ERR_SCRIPT_DROP, "script link error\n%s", unknown_function_error.data());
 			}
 
 			return res;
@@ -124,7 +124,7 @@ namespace gsc
 			try
 			{
 				const auto index = gsc_ctx->opcode_enum(opcode);
-				return {gsc_ctx->opcode_name(index)};
+				return { gsc_ctx->opcode_name(index) };
 			}
 			catch (...)
 			{
