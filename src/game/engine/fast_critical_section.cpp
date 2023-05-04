@@ -6,8 +6,8 @@
 namespace game::engine
 {
 	fast_critical_section_scope_read::fast_critical_section_scope_read(native::FastCriticalSection* cs)
+		: cs_(cs)
 	{
-		this->cs_ = cs;
 		if (this->cs_)
 		{
 			native::Sys_LockRead(this->cs_);
@@ -23,8 +23,8 @@ namespace game::engine
 	}
 
 	fast_critical_section_scope_write::fast_critical_section_scope_write(native::FastCriticalSection* cs)
+		: cs_(cs)
 	{
-		this->cs_ = cs;
 		if (this->cs_)
 		{
 			native::Sys_LockWrite(this->cs_);
