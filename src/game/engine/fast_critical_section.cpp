@@ -5,7 +5,7 @@
 
 namespace game::engine
 {
-	FastCriticalSectionScopeRead::FastCriticalSectionScopeRead(native::FastCriticalSection* cs)
+	fast_critical_section_scope_read::fast_critical_section_scope_read(native::FastCriticalSection* cs)
 	{
 		this->cs_ = cs;
 		if (this->cs_)
@@ -14,7 +14,7 @@ namespace game::engine
 		}
 	}
 
-	FastCriticalSectionScopeRead::~FastCriticalSectionScopeRead()
+	fast_critical_section_scope_read::~fast_critical_section_scope_read()
 	{
 		if (this->cs_)
 		{
@@ -22,7 +22,7 @@ namespace game::engine
 		}
 	}
 
-	FastCriticalSectionScopeWrite::FastCriticalSectionScopeWrite(native::FastCriticalSection* cs)
+	fast_critical_section_scope_write::fast_critical_section_scope_write(native::FastCriticalSection* cs)
 	{
 		this->cs_ = cs;
 		if (this->cs_)
@@ -31,7 +31,7 @@ namespace game::engine
 		}
 	}
 
-	FastCriticalSectionScopeWrite::~FastCriticalSectionScopeWrite()
+	fast_critical_section_scope_write::~fast_critical_section_scope_write()
 	{
 		if (this->cs_)
 		{

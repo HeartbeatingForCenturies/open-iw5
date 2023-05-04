@@ -2,21 +2,21 @@
 
 namespace game::engine
 {
-	class FastCriticalSectionScopeRead
+	class fast_critical_section_scope_read
 	{
 	public:
-		FastCriticalSectionScopeRead(native::FastCriticalSection* cs);
-		~FastCriticalSectionScopeRead();
+		fast_critical_section_scope_read(native::FastCriticalSection* cs);
+		~fast_critical_section_scope_read();
 
 	private:
 		native::FastCriticalSection* cs_;
 	};
 
-	class FastCriticalSectionScopeWrite
+	class fast_critical_section_scope_write
 	{
 	public:
-		FastCriticalSectionScopeWrite(native::FastCriticalSection* cs);
-		~FastCriticalSectionScopeWrite();
+		fast_critical_section_scope_write(native::FastCriticalSection* cs);
+		~fast_critical_section_scope_write();
 
 	private:
 		native::FastCriticalSection* cs_;
