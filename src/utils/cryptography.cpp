@@ -29,7 +29,7 @@ namespace utils::cryptography
 	std::string ecc::key::get_public_key() const
 	{
 		uint8_t buffer[512] = {0};
-		DWORD length = sizeof(buffer);
+		unsigned long length = sizeof(buffer);
 
 		if (ecc_ansi_x963_export(&this->key_storage_, buffer, &length) == CRYPT_OK)
 		{
@@ -63,14 +63,14 @@ namespace utils::cryptography
 	std::string ecc::key::serialize(const int type) const
 	{
 		uint8_t buffer[4096] = {0};
-		DWORD length = sizeof(buffer);
+		unsigned long length = sizeof(buffer);
 
 		if (ecc_export(buffer, &length, type, &this->key_storage_) == CRYPT_OK)
 		{
 			return std::string(reinterpret_cast<char*>(buffer), length);
 		}
 
-		return "";
+		return {};
 	}
 
 	void ecc::key::free()
@@ -101,14 +101,16 @@ namespace utils::cryptography
 
 	std::string ecc::sign_message(key key, const std::string& message)
 	{
-		if (!key.is_valid()) return "";
+		if (!key.is_valid()) return {};
 
 		uint8_t buffer[512];
-		DWORD length = sizeof(buffer);
+		unsigned long length = sizeof(buffer);
+
+		const auto hash = sha512::compute(message);
 
 		ltc_mp = ltm_desc;
 		register_prng(&sprng_desc);
-		ecc_sign_hash(reinterpret_cast<const uint8_t*>(message.data()), message.size(), buffer, &length, nullptr,
+		ecc_sign_hash(reinterpret_cast<const uint8_t*>(hash.data()), hash.size(), buffer, &length, nullptr,
 		              find_prng("sprng"), key.get());
 
 		return std::string(reinterpret_cast<char*>(buffer), length);
@@ -118,11 +120,13 @@ namespace utils::cryptography
 	{
 		if (!key.is_valid()) return false;
 
+		const auto hash = sha512::compute(message);
+
 		ltc_mp = ltm_desc;
 
 		auto result = 0;
 		return (ecc_verify_hash(reinterpret_cast<const uint8_t*>(signature.data()), signature.size(),
-		                        reinterpret_cast<const uint8_t*>(message.data()), message.size(), &result,
+		                        reinterpret_cast<const uint8_t*>(hash.data()), hash.size(), &result,
 		                        key.get()) == CRYPT_OK && result != 0);
 	}
 
@@ -238,7 +242,7 @@ namespace utils::cryptography
 		std::string hash(reinterpret_cast<char*>(buffer), sizeof(buffer));
 		if (!hex) return hash;
 
-		return string::dump_hex(hash, "");
+		return string::dump_hex(hash, {});
 	}
 
 	std::string sha1::compute(const std::string& data, const bool hex)
@@ -258,7 +262,7 @@ namespace utils::cryptography
 		std::string hash(reinterpret_cast<char*>(buffer), sizeof(buffer));
 		if (!hex) return hash;
 
-		return string::dump_hex(hash, "");
+		return string::dump_hex(hash, {});
 	}
 
 	std::string sha256::compute(const std::string& data, const bool hex)
@@ -278,7 +282,7 @@ namespace utils::cryptography
 		std::string hash(reinterpret_cast<char*>(buffer), sizeof(buffer));
 		if (!hex) return hash;
 
-		return string::dump_hex(hash, "");
+		return string::dump_hex(hash, {});
 	}
 
 	std::string sha512::compute(const std::string& data, const bool hex)
@@ -298,7 +302,7 @@ namespace utils::cryptography
 		std::string hash(reinterpret_cast<char*>(buffer), sizeof(buffer));
 		if (!hex) return hash;
 
-		return string::dump_hex(hash, "");
+		return string::dump_hex(hash, {});
 	}
 
 	unsigned int jenkins_one_at_a_time::compute(const std::string& data)
