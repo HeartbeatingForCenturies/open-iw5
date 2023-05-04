@@ -39,6 +39,7 @@
 #endif
 
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <filesystem>
 #include <format>

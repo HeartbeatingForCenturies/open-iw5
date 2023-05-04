@@ -164,6 +164,12 @@ namespace game
 		typedef int (*Sys_MessageBox_t)(const char* lpText, const char* lpCaption, unsigned int uType, int defaultValue);
 		extern Sys_MessageBox_t Sys_MessageBox;
 
+		typedef void (*Sys_LockWrite_t)(FastCriticalSection* critSect);
+		extern Sys_LockWrite_t Sys_LockWrite;
+
+		typedef void (*Sys_TempPriorityEnd_t)(TempPriority*);
+		extern Sys_TempPriorityEnd_t Sys_TempPriorityEnd;
+
 		typedef void* (*PMem_AllocFromSource_NoDebug_t)(unsigned int size, unsigned int alignment, unsigned int type, int source);
 		extern PMem_AllocFromSource_NoDebug_t PMem_AllocFromSource_NoDebug;
 
@@ -427,6 +433,7 @@ namespace game
 		bool Sys_IsServerThread();
 		void Sys_LockRead(FastCriticalSection* critSect);
 		void Sys_UnlockRead(FastCriticalSection* critSect);
+		void Sys_UnlockWrite(FastCriticalSection* critSect);
 		[[noreturn]] void Sys_OutOfMemErrorInternal(const char* filename, int line);
 
 		bool FS_Initialized();

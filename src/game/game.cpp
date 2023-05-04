@@ -72,6 +72,8 @@ namespace game
 		Sys_Sleep_t Sys_Sleep;
 		Sys_FreeFileList_t Sys_FreeFileList;
 		Sys_MessageBox_t Sys_MessageBox;
+		Sys_LockWrite_t Sys_LockWrite;
+		Sys_TempPriorityEnd_t Sys_TempPriorityEnd;
 
 		PMem_AllocFromSource_NoDebug_t PMem_AllocFromSource_NoDebug;
 
@@ -569,6 +571,13 @@ namespace game
 			InterlockedDecrement(&critSect->readCount);
 		}
 
+		void Sys_UnlockWrite(FastCriticalSection* critSect)
+		{
+			assert(critSect->writeCount > 0);
+			InterlockedDecrement(&critSect->writeCount);
+			Sys_TempPriorityEnd(&critSect->tempPriority);
+		}
+
 		[[noreturn]] void Sys_OutOfMemErrorInternal(const char* filename, int line)
 		{
 			Sys_EnterCriticalSection(CRITSECT_FATAL_ERROR);
@@ -801,6 +810,8 @@ namespace game
 		native::Sys_Sleep = native::Sys_Sleep_t(SELECT_VALUE(0x438600, 0x55F460));
 		native::Sys_FreeFileList = native::Sys_FreeFileList_t(SELECT_VALUE(0x486380, 0x5C4F90));
 		native::Sys_MessageBox = native::Sys_MessageBox_t(SELECT_VALUE(0x4664D0, 0x5CD180));
+		native::Sys_LockWrite = native::Sys_LockWrite_t(SELECT_VALUE(0x4C9E70, 0x5502D0));
+		native::Sys_TempPriorityEnd = native::Sys_TempPriorityEnd_t(SELECT_VALUE(0x4DCF00, 0x4C8CF0));
 
 		native::PMem_AllocFromSource_NoDebug = native::PMem_AllocFromSource_NoDebug_t(SELECT_VALUE(0x449E50, 0x5C15C0));
 
