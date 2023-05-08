@@ -430,7 +430,7 @@ namespace gsc
 
 	void scr_error(const char* error)
 	{
-		strncpy_s(gsc_error_msg, error, _TRUNCATE);
+		game::native::I_strncpyz(gsc_error_msg, error, sizeof(gsc_error_msg));
 		game::native::Scr_ErrorInternal();
 	}
 
@@ -445,35 +445,72 @@ namespace gsc
 		return nullptr;
 	}
 
-	game::native::gentity_s* get_entity(game::native::scr_entref_t entref)
+	namespace mp
 	{
-		if (entref.classnum)
+		game::native::gentity_s* get_entity(const game::native::scr_entref_t entref)
 		{
-			scr_error("not an entity");
-			return nullptr;
+			if (entref.classnum)
+			{
+				scr_error("not an entity");
+				return nullptr;
+			}
+
+			assert(entref.entnum < game::native::MAX_GENTITIES);
+			return &game::native::mp::g_entities[entref.entnum];
 		}
 
-		assert(entref.entnum < game::native::MAX_GENTITIES);
-		return &game::native::g_entities[entref.entnum];
+		game::native::gentity_s* get_player_entity(const game::native::scr_entref_t entref)
+		{
+			if (entref.classnum)
+			{
+				scr_error("not an entity");
+				return nullptr;
+			}
+
+			assert(entref.entnum < game::native::MAX_GENTITIES);
+			auto* ent = &game::native::mp::g_entities[entref.entnum];
+			if (!ent->client)
+			{
+				scr_error(va("entity %i is not a player", entref.entnum));
+				return nullptr;
+			}
+
+			return ent;
+		}
 	}
 
-	game::native::gentity_s* get_player_entity(game::native::scr_entref_t entref)
+	namespace sp
 	{
-		if (entref.classnum)
+		game::native::sp::gentity_s* get_entity(const game::native::scr_entref_t entref)
 		{
-			scr_error("not an entity");
-			return nullptr;
+			if (entref.classnum)
+			{
+				scr_error("not an entity");
+				return nullptr;
+			}
+
+			assert(entref.entnum < game::native::MAX_GENTITIES);
+			return &game::native::sp::g_entities[entref.entnum];
 		}
 
-		assert(entref.entnum < game::native::MAX_GENTITIES);
-		auto* ent =  &game::native::g_entities[entref.entnum];
-		if (!ent->client)
+		game::native::sp::gentity_s* get_player_entity(const game::native::scr_entref_t entref)
 		{
-			scr_error(va("entity %i is not a player", entref.entnum));
-			return nullptr;
-		}
+			if (entref.classnum)
+			{
+				scr_error("not an entity");
+				return nullptr;
+			}
 
-		return ent;
+			assert(entref.entnum < game::native::MAX_GENTITIES);
+			auto* ent = &game::native::sp::g_entities[entref.entnum];
+			if (!ent->client)
+			{
+				scr_error(va("entity %i is not a player", entref.entnum));
+				return nullptr;
+			}
+
+			return ent;
+		}
 	}
 
 	class error final : public module

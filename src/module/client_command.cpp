@@ -68,13 +68,13 @@ namespace
 
 	void player_cmd_noclip(game::native::scr_entref_t entref)
 	{
-		auto* ent = gsc::get_player_entity(entref);
+		auto* ent = gsc::mp::get_player_entity(entref);
 		cmd_noclip_f(ent, command::params_sv{});
 	}
 
 	void player_cmd_ufo(game::native::scr_entref_t entref)
 	{
-		auto* ent = gsc::get_player_entity(entref);
+		auto* ent = gsc::mp::get_player_entity(entref);
 		cmd_ufo_f(ent, command::params_sv{});
 	}
 }

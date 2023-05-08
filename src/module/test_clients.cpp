@@ -234,9 +234,8 @@ void test_clients::patch_mp()
 
 	gsc::register_method("IsTestClient", [](const game::native::scr_entref_t entref)
 	{
-		gsc::get_entity(entref);
-
-		if (game::native::g_entities[entref.entnum].client == nullptr)
+		const auto* ent = gsc::mp::get_entity(entref);
+		if (!ent->client)
 		{
 			gsc::scr_error("IsTestClient: entity must be a player entity");
 		}

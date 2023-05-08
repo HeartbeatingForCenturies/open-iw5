@@ -44,6 +44,9 @@ namespace game
 		typedef const char* (*DB_GetXAssetName_t)(const XAsset* asset);
 		extern DB_GetXAssetName_t DB_GetXAssetName;
 
+		typedef dvar_t* (*Dvar_FindVar_t)(const char* dvarName);
+		extern Dvar_FindVar_t Dvar_FindVar;
+
 		typedef const dvar_t* (*Dvar_RegisterBool_t)(const char* dvarName, bool value, unsigned __int16 flags, const char* description);
 		extern Dvar_RegisterBool_t Dvar_RegisterBool;
 
@@ -225,20 +228,23 @@ namespace game
 		extern SEH_GetLanguageName_t SEH_GetLanguageName;
 
 		typedef void (*CM_TransformedCapsuleTrace_t)(trace_t* results, const float* start, const float* end,
-			const Bounds* bounds, const Bounds* capsule, int contents,
-			const float* origin, const float* angles);
+		                                             const Bounds* bounds, const Bounds* capsule, int contents,
+		                                             const float* origin, const float* angles);
 		extern CM_TransformedCapsuleTrace_t CM_TransformedCapsuleTrace;
 
-		typedef void (*PM_WeaponUseAmmo_t)(playerState_s* ps, const Weapon weapon, bool isAlternate, int amount, PlayerHandIndex hand);
+		typedef void (*PM_WeaponUseAmmo_t)(playerState_s* ps, Weapon weapon, bool isAlternate, int amount, PlayerHandIndex hand);
 		extern PM_WeaponUseAmmo_t PM_WeaponUseAmmo;
 
 		typedef void (*PM_playerTrace_t)(pmove_t* pm, trace_t* results, const float* start, const float* end,
-			const Bounds* bounds, int passEntityNum, int contentMask);
+		                                 const Bounds* bounds, int passEntityNum, int contentMask);
 		extern PM_playerTrace_t PM_playerTrace;
 
 		typedef void (*PM_trace_t)(const pmove_t* pm, trace_t* results, const float* start, const float* end,
-			const Bounds* bounds, int passEntityNum, int contentMask);
+		                           const Bounds* bounds, int passEntityNum, int contentMask);
 		extern PM_trace_t PM_trace;
+
+		typedef bool (*PM_IsSprinting_t)(const void* ps);
+		extern PM_IsSprinting_t PM_IsSprinting;
 
 		typedef void (*Jump_ClearState_t)(playerState_s* ps);
 		extern Jump_ClearState_t Jump_ClearState;
@@ -282,6 +288,9 @@ namespace game
 		typedef const char* (*Key_KeynumToString_t)(int keynum, int translate);
 		extern Key_KeynumToString_t Key_KeynumToString;
 
+		typedef void (*I_strncpyz_t)(char* dest, const char* src, int destsize);
+		extern I_strncpyz_t I_strncpyz;
+
 		extern decltype(longjmp)* _longjmp;
 
 		constexpr auto CMD_MAX_NESTING = 8;
@@ -308,7 +317,6 @@ namespace game
 
 		constexpr auto MAX_GENTITIES = 2048u;
 		constexpr auto ENTITYNUM_NONE = MAX_GENTITIES - 1u;
-		extern gentity_s* g_entities;
 
 		extern DeferredQueue* deferredQueue;
 
@@ -368,9 +376,14 @@ namespace game
 			typedef void (*SV_GameSendServerCommand_t)(int clientNum, svscmd_type type, const char* text);
 			extern SV_GameSendServerCommand_t SV_GameSendServerCommand;
 
+			typedef void (*ClientCommand_t)(int clientNum);
+			extern ClientCommand_t ClientCommand;
+
 			extern client_t* svs_clients;
 
 			extern level_locals_t* level;
+
+			extern gentity_s* g_entities;
 		}
 
 		namespace sp
@@ -396,8 +409,6 @@ namespace game
 
 		void* MT_Alloc(int numBytes, int type);
 
-		dvar_t* Dvar_FindVar(const char* dvarName);
-
 		const float* Scr_AllocVector(const float* v);
 		void Scr_ClearOutParams();
 		scr_entref_t Scr_GetEntityIdRef(unsigned int id);
@@ -412,8 +423,6 @@ namespace game
 		int SV_IsTestClient(int clientNum);
 		void SV_DropClient(mp::client_t* drop, const char* reason, bool tellThem);
 		void SV_DropAllBots();
-
-		void ClientCommand(int clientNum);
 
 		int GetProtocolVersion();
 

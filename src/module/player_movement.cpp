@@ -1,9 +1,13 @@
 #include <std_include.hpp>
 #include <loader/module_loader.hpp>
+#include "game/game.hpp"
+
 #include <utils/hook.hpp>
 
-#include "game/game.hpp"
 #include "player_movement.hpp"
+
+#include "gsc/script_extension.hpp"
+#include "gsc/script_error.hpp"
 
 const game::native::dvar_t* player_movement::player_sustainAmmo;
 const game::native::dvar_t* player_movement::player_lastStandCrawlSpeedScale;
@@ -609,6 +613,18 @@ void player_movement::patch_mp()
 	utils::hook(0x4220E5, pm_cmd_scale_crawl_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
 	utils::hook(0x422104, pm_cmd_scale_ducked_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
 	utils::hook(0x42210E, pm_cmd_scale_prone_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
+
+	gsc::register_method("IsSprinting", [](const game::native::scr_entref_t entref) -> void
+	{
+		const auto* client = gsc::mp::get_entity(entref)->client;
+		if (!client)
+		{
+			gsc::scr_error("IsSprinting can only be called on a player");
+			return;
+		}
+
+		game::native::Scr_AddInt(game::native::PM_IsSprinting(&client->ps));
+	});
 }
 
 void player_movement::patch_sp()
@@ -663,6 +679,18 @@ void player_movement::patch_sp()
 	utils::hook(0x64384F, pm_cmd_scale_crawl_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
 	utils::hook(0x643859, pm_cmd_scale_ducked_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
 	utils::hook(0x643863, pm_cmd_scale_prone_speed_stub, HOOK_JUMP).install()->quick(); // PM_CmdScaleForStance
+
+	gsc::register_method("IsSprinting", [](const game::native::scr_entref_t entref) -> void
+	{
+		const auto* client = gsc::sp::get_entity(entref)->client;
+		if (!client)
+		{
+			gsc::scr_error("IsSprinting can only be called on a player");
+			return;
+		}
+
+		game::native::Scr_AddInt(game::native::PM_IsSprinting(&client->ps));
+	});
 }
 
 void player_movement::register_common_dvars()

@@ -21,6 +21,7 @@ namespace game
 		DB_EnumXAssets_t DB_EnumXAssets;
 		DB_GetXAssetName_t DB_GetXAssetName;
 
+		Dvar_FindVar_t Dvar_FindVar;
 		Dvar_RegisterBool_t Dvar_RegisterBool;
 		Dvar_RegisterFloat_t Dvar_RegisterFloat;
 		Dvar_RegisterInt_t Dvar_RegisterInt;
@@ -107,6 +108,7 @@ namespace game
 		PM_WeaponUseAmmo_t PM_WeaponUseAmmo;
 		PM_playerTrace_t PM_playerTrace;
 		PM_trace_t PM_trace;
+		PM_IsSprinting_t PM_IsSprinting;
 
 		Jump_ClearState_t Jump_ClearState;
 
@@ -130,6 +132,8 @@ namespace game
 		Win_LocalizeRef_t Win_LocalizeRef;
 
 		Key_KeynumToString_t Key_KeynumToString;
+
+		I_strncpyz_t I_strncpyz;
 
 		decltype(longjmp)* _longjmp;
 
@@ -199,9 +203,13 @@ namespace game
 			SV_GetGuid_t SV_GetGuid;
 			SV_GameSendServerCommand_t SV_GameSendServerCommand;
 
+			ClientCommand_t ClientCommand;
+
 			client_t* svs_clients;
 
 			level_locals_t* level;
+
+			gentity_s* g_entities;
 		}
 
 		namespace sp
@@ -257,11 +265,6 @@ namespace game
 		void* MT_Alloc(const int numBytes, const int type)
 		{
 			return scrMemTreeGlob + 12 * size_t(MT_AllocIndex(numBytes, type));
-		}
-
-		dvar_t* Dvar_FindVar(const char* dvarName)
-		{
-			return reinterpret_cast<dvar_t*(*)(const char*)>(SELECT_VALUE(0x539550, 0x5BDCC0))(dvarName);
 		}
 
 		void IncInParam()
@@ -397,19 +400,16 @@ namespace game
 			return sl_get_canonical_string(str);
 		}
 
-		__declspec(naked) void sv_send_client_game_state_mp(mp::client_t* /*client*/)
+		void sv_send_client_game_state_mp(mp::client_t* client)
 		{
 			static DWORD func = 0x570FC0;
 
 			__asm
 			{
 				pushad
-
-				mov esi, [esp + 0x20 + 0x4]
+				mov esi, client
 				call func
-
 				popad
-				retn
 			}
 		}
 
@@ -458,14 +458,6 @@ namespace game
 			if (is_mp())
 			{
 				sv_drop_all_bots_mp();
-			}
-		}
-
-		void ClientCommand(int clientNum)
-		{
-			if (is_mp())
-			{
-				reinterpret_cast<void(*)(int)>(0x502CB0)(clientNum);
 			}
 		}
 
@@ -758,6 +750,7 @@ namespace game
 		native::DB_EnumXAssets = native::DB_EnumXAssets_t(SELECT_VALUE(0x50A0D0, 0x4CA2D0));
 		native::DB_GetXAssetName = native::DB_GetXAssetName_t(SELECT_VALUE(0x438100, 0x4B7C10));
 
+		native::Dvar_FindVar = native::Dvar_FindVar_t(SELECT_VALUE(0x539550, 0x5BDCC0));
 		native::Dvar_RegisterBool = native::Dvar_RegisterBool_t(SELECT_VALUE(0x4914D0, 0x5BE9F0));
 		native::Dvar_RegisterFloat = native::Dvar_RegisterFloat_t(SELECT_VALUE(0x4F9CC0, 0x5BEA80));
 		native::Dvar_RegisterInt = native::Dvar_RegisterInt_t(SELECT_VALUE(0x48CD40, 0x5BEA40));
@@ -835,8 +828,9 @@ namespace game
 		native::SV_Cmd_EndTokenizedString = native::SV_Cmd_EndTokenizedString_t(SELECT_VALUE(0x0, 0x545D70));
 		native::SV_SpawnServer = native::SV_SpawnServer_t(SELECT_VALUE(0x0, 0x575020));
 		native::SV_GetConfigstring = native::SV_GetConfigstring_t(SELECT_VALUE(0x4C6E30, 0x573D50));
-		native::mp::SV_GameSendServerCommand = native::mp::SV_GameSendServerCommand_t(0x573220);
 		native::mp::SV_GetGuid = native::mp::SV_GetGuid_t(0x573990);
+		native::mp::SV_GameSendServerCommand = native::mp::SV_GameSendServerCommand_t(0x573220);
+		native::mp::ClientCommand = native::mp::ClientCommand_t(0x502CB0);
 
 		native::sp::IsServerRunning = native::sp::IsServerRunning_t(0x45D310);
 		native::sp::SV_GameSendServerCommand = native::sp::SV_GameSendServerCommand_t(0x402130);
@@ -853,6 +847,7 @@ namespace game
 		native::PM_WeaponUseAmmo = native::PM_WeaponUseAmmo_t(SELECT_VALUE(0x463F80, 0x42E930));
 		native::PM_playerTrace = native::PM_playerTrace_t(SELECT_VALUE(0x4CE600, 0x421F00));
 		native::PM_trace = native::PM_trace_t(SELECT_VALUE(0x544BF0, 0x41CEB0));
+		native::PM_IsSprinting = native::PM_IsSprinting_t(SELECT_VALUE(0x451A40, 0x41D330));
 
 		native::Jump_ClearState = native::Jump_ClearState_t(SELECT_VALUE(0x514CE0, 0x4160F0));
 
@@ -876,6 +871,8 @@ namespace game
 		native::Win_LocalizeRef = native::Win_LocalizeRef_t(SELECT_VALUE(0x49D7E0, 0x5CBE90));
 
 		native::Key_KeynumToString = native::Key_KeynumToString_t(SELECT_VALUE(0x4BB000, 0x48C080));
+
+		native::I_strncpyz = native::I_strncpyz_t(SELECT_VALUE(0x53A950, 0x5C2940));
 
 		native::_longjmp = reinterpret_cast<decltype(longjmp)*>(SELECT_VALUE(0x73AC20, 0x7363BC));
 
@@ -901,7 +898,7 @@ namespace game
 
 		native::mp::svs_clients = reinterpret_cast<native::mp::client_t*>(0x4B5CF90);
 
-		native::g_entities = reinterpret_cast<native::gentity_s*>(0x1A66E28);
+		native::mp::g_entities = reinterpret_cast<native::gentity_s*>(0x1A66E28);
 		native::sp::g_entities = reinterpret_cast<native::sp::gentity_s*>(0x1197AD8);
 
 		native::sp::g_clients = reinterpret_cast<native::sp::gclient_s*>(0x1381D48);

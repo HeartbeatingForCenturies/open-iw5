@@ -157,7 +157,7 @@ void command::main_handler()
 
 void command::client_command_stub(int client_num)
 {
-	const auto entity = &game::native::g_entities[client_num];
+	const auto entity = &game::native::mp::g_entities[client_num];
 
 	if (!entity->client)
 	{
@@ -174,7 +174,7 @@ void command::client_command_stub(int client_num)
 		return;
 	}
 
-	game::native::ClientCommand(client_num);
+	game::native::mp::ClientCommand(client_num);
 }
 
 void command::client_command_sp(int client_num, const char* s)

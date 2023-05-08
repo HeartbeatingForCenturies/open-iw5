@@ -6,43 +6,46 @@
 
 #include <utils/hook.hpp>
 
-static void notify_on_say(game::native::gentity_s* ent, int mode, const char* message)
+namespace
 {
-	game::native::Scr_AddString(message + 1); // First character has nothing to do with actual message
-	game::native::Scr_AddInt(mode);
-	game::native::Scr_AddEntityNum(ent - game::native::g_entities, 0);
-
-	game::native::Scr_NotifyLevel(game::native::SL_GetString("say", 0), 3);
-
-	const auto* guid = game::native::mp::SV_GetGuid(ent - game::native::g_entities);
-	const auto* name = game::native::mp::svs_clients[ent - game::native::g_entities].name;
-
-	if (mode == 0)
+	void notify_on_say(game::native::gentity_s* ent, int mode, const char* message)
 	{
-		game_log::g_log_printf("say;%s;%d;%s;%s\n", guid, ent - game::native::g_entities, name, message);
+		game::native::Scr_AddString(message + 1); // First character has nothing to do with actual message
+		game::native::Scr_AddInt(mode);
+		game::native::Scr_AddEntityNum(ent - game::native::mp::g_entities, 0);
+
+		game::native::Scr_NotifyLevel(game::native::SL_GetString("say", 0), 3);
+
+		const auto* guid = game::native::mp::SV_GetGuid(ent - game::native::mp::g_entities);
+		const auto* name = game::native::mp::svs_clients[ent - game::native::mp::g_entities].name;
+
+		if (mode == 0)
+		{
+			game_log::g_log_printf("say;%s;%d;%s;%s\n", guid, ent - game::native::mp::g_entities, name, message);
+		}
+		else
+		{
+			game_log::g_log_printf("sayteam;%s;%d;%s;%s\n", guid, ent - game::native::mp::g_entities, name, message);
+		}
 	}
-	else
+
+	__declspec(naked) void g_say_stub()
 	{
-		game_log::g_log_printf("sayteam;%s;%d;%s;%s\n", guid, ent - game::native::g_entities, name, message);
-	}
-}
+		__asm
+		{
+			pushad
 
-static __declspec(naked) void g_say_stub()
-{
-	__asm
-	{
-		pushad
+			push [esp + 0x20 + 0x108] // message
+			push [esp + 0x20 + 0x108] // mode
+			push ebp // ent
+			call notify_on_say
+			add esp, 0xC
 
-		push [esp + 0x20 + 0x108] // message
-		push [esp + 0x20 + 0x108] // mode
-		push ebp // ent
-		call notify_on_say
-		add esp, 0xC
+			popad
 
-		popad
-
-		push 0x5C2940 // I_strncpyz
-		retn
+			push 0x5C2940 // I_strncpyz
+			retn
+		}
 	}
 }
 

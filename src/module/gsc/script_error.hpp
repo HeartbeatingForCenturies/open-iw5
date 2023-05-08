@@ -16,8 +16,17 @@ namespace gsc
 	int scr_get_type(unsigned int index);
 	const char* scr_get_type_name(unsigned int index);
 
-	game::native::gentity_s* get_entity(game::native::scr_entref_t entref);
-	game::native::gentity_s* get_player_entity(game::native::scr_entref_t entref);
-
 	void scr_error(const char* error);
+
+	namespace mp
+	{
+		game::native::gentity_s* get_entity(game::native::scr_entref_t entref);
+		game::native::gentity_s* get_player_entity(game::native::scr_entref_t entref);
+	}
+
+	namespace sp
+	{
+		game::native::sp::gentity_s* get_entity(game::native::scr_entref_t entref);
+		game::native::sp::gentity_s* get_player_entity(game::native::scr_entref_t entref);
+	}
 }
