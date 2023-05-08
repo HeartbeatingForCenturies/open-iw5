@@ -197,7 +197,7 @@ namespace gsc
 			scr_error(va("%s (effect = %s)\n", error_string, fx_name));
 		}
 
-		void gscr_cast_int()
+		void g_scr_cast_int()
 		{
 			switch (scr_get_type(0))
 			{
@@ -216,7 +216,7 @@ namespace gsc
 			}
 		}
 
-		void gscr_cast_float()
+		void g_scr_cast_float()
 		{
 			switch (scr_get_type(0))
 			{
@@ -471,7 +471,7 @@ namespace gsc
 			auto* ent = &game::native::mp::g_entities[entref.entnum];
 			if (!ent->client)
 			{
-				scr_error(va("entity %i is not a player", entref.entnum));
+				scr_error(va("entity %hu is not a player", entref.entnum));
 				return nullptr;
 			}
 
@@ -505,7 +505,7 @@ namespace gsc
 			auto* ent = &game::native::sp::g_entities[entref.entnum];
 			if (!ent->client)
 			{
-				scr_error(va("entity %i is not a player", entref.entnum));
+				scr_error(va("entity %hu is not a player", entref.entnum));
 				return nullptr;
 			}
 
@@ -545,8 +545,8 @@ namespace gsc
 			utils::hook(SELECT_VALUE(0x4D6510, 0x56A980), &scr_get_pointer_type, HOOK_JUMP).install()->quick();
 			utils::hook(SELECT_VALUE(0x4958D0, 0x56A8C0), &scr_get_type, HOOK_JUMP).install()->quick();
 
-			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92BB58, 0x8AC040), gscr_cast_int);
-			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92BB64, 0x8AC04C), gscr_cast_float);
+			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92BB58, 0x8AC040), g_scr_cast_int);
+			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92BB64, 0x8AC04C), g_scr_cast_float);
 
 			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92B93C, 0x8ABE24), assert_cmd);
 			utils::hook::set<game::native::BuiltinFunction>(SELECT_VALUE(0x92B948, 0x8ABE30), assert_ex_cmd);
