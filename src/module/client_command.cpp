@@ -33,17 +33,6 @@ namespace
 		return true;
 	}
 
-	bool cheats_ok_internal(game::native::sp::gentity_s* ent)
-	{
-		if (ent->health < 1)
-		{
-			game::native::sp::SV_GameSendServerCommand(ent->s.number, "print \"GAME_MUSTBEALIVECOMMAND\"");
-			return false;
-		}
-
-		return true;
-	}
-
 	void cmd_noclip_f(game::native::gentity_s* ent, [[maybe_unused]] const command::params_sv& params)
 	{
 		if (!cheats_ok(ent))
